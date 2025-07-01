@@ -1,0 +1,48 @@
+name: securecapture
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Core
+  intl: ^0.20.2
+  path: ^1.9.1
+  get_it: ^8.0.3
+  camera: ^0.11.1
+  encrypt: ^5.0.3
+  rxdart: ^0.28.0
+  sqflite: ^2.4.2
+  injectable: ^2.5.0
+  collection: ^1.19.1
+  flutter_bloc: ^9.1.1
+  path_provider: ^2.1.5
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.4
+  shared_preferences: ^2.5.3
+  permission_handler: ^12.0.0+1
+
+  # Services
+  image: ^4.5.4
+  file_picker: ^10.1.9
+  image_picker: ^1.1.2
+  biometric_storage: ^5.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  freezed: ^2.5.8
+  build_runner: ^2.4.15
+  flutter_lints: ^6.0.0
+  json_serializable: ^6.9.5
+  injectable_generator: ^2.7.0
+
+flutter:
+  uses-material-design: true
