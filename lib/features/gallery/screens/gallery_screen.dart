@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:securecapture/core/shared_data/models/image.dart';
 import 'package:securecapture/core/shared_domain/managers/authentication/authentication_manager.dart';
+import 'package:securecapture/core/shared_domain/managers/encryption/encryption_manager.dart';
 import 'package:securecapture/core/shared_domain/repositories/image_repository.dart';
 import 'package:securecapture/core/widgets/custom_app_bar.dart';
 import 'package:securecapture/core/widgets/error_view.dart';
@@ -20,8 +21,11 @@ class GalleryScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(title: 'Gallery'),
       body: BlocProvider(
-        create: (context) =>
-            GalleryCubit(authenticationManager: getIt<AuthenticationManager>(), imageRepository: getIt<ImageRepository>())..init(),
+        create: (context) => GalleryCubit(
+          authenticationManager: getIt<AuthenticationManager>(),
+          imageRepository: getIt<ImageRepository>(),
+          encryptionManager: getIt<EncryptionManager>(),
+        )..init(),
         child: const _Body(),
       ),
     );

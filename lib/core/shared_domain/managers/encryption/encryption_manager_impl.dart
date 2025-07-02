@@ -28,7 +28,7 @@ class EncryptionManagerImpl implements EncryptionManager {
       final keyBytes = List<int>.generate(32, (i) => random.nextInt(256));
       final newKey = base64.encode(keyBytes);
 
-      // TODO: Adjust Android and iOS options to make it more secure
+      // IDEA: Adjust Android and iOS options to make it more secure
       await _secureStorage.write(key: _masterKeyStorageKey, value: newKey, aOptions: AndroidOptions(), iOptions: IOSOptions());
     } catch (e) {
       throw CommonError('Failed to generate encryption key: ${e.toString()}');
@@ -36,21 +36,8 @@ class EncryptionManagerImpl implements EncryptionManager {
   }
 
   @override
-  Future<String?> getStoredKey() async {
-    try {
-      final bool isAuthenticated = await _authenticationManager.authenticate();
-
-      if (!isAuthenticated) throw CommonError('Failed to authenticate');
-
-      return await _secureStorage.read(key: _masterKeyStorageKey);
-    } catch (e) {
-      throw CommonError('Failed to retrieve encryption key: ${e.toString()}');
-    }
-  }
-
-  @override
   Future<List<int>> encryptImageData(List<int> imageBytes) async {
-    final keyString = await getStoredKey();
+    final keyString = await _getStoredKey();
     if (keyString == null) {
       throw CommonError('No encryption key available');
     }
@@ -88,25 +75,30 @@ class EncryptionManagerImpl implements EncryptionManager {
     try {
       if (encryptedBytes.length < 16) throw CommonError('Invalid encrypted data: too short');
 
-      final keyString = await getStoredKey();
+      final keyString = await _getStoredKey();
       if (keyString == null) throw CommonError('No encryption key available');
 
       final keyBytes = base64.decode(keyString);
       final encryptionKey = Key(keyBytes);
-
-      // Initialization Vector
       final iv = IV(Uint8List.fromList(encryptedBytes.take(16).toList()));
-
-      // Encrypted Image Data
       final encrypted = Encrypted(Uint8List.fromList(encryptedBytes.skip(16).toList()));
-
-      // Create AES decrypter
       final encrypter = Encrypter(AES(encryptionKey));
 
-      // Decrypt the data
       return encrypter.decryptBytes(encrypted, iv: iv);
     } catch (e) {
       throw CommonError('Image decryption failed: ${e.toString()}');
+    }
+  }
+
+  Future<String?> _getStoredKey() async {
+    try {
+      final bool isAuthenticated = await _authenticationManager.authenticate();
+
+      if (!isAuthenticated) throw CommonError('Failed to authenticate');
+
+      return await _secureStorage.read(key: _masterKeyStorageKey);
+    } catch (e) {
+      throw CommonError('Failed to retrieve encryption key: ${e.toString()}');
     }
   }
 }

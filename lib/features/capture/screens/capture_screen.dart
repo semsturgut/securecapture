@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:securecapture/core/shared_domain/managers/authentication/authentication_manager.dart';
 import 'package:securecapture/core/shared_domain/managers/encryption/encryption_manager.dart';
 import 'package:securecapture/core/shared_domain/repositories/image_repository.dart';
 import 'package:securecapture/core/widgets/custom_app_bar.dart';
@@ -23,8 +24,9 @@ class CaptureScreen extends StatelessWidget {
       create: (context) => CaptureCubit(
         permissionManager: getIt<PermissionManager>(),
         cameraManager: getIt<CameraManager>(),
-        encryptionManager: getIt<EncryptionManager>(),
         imageRepository: getIt<ImageRepository>(),
+        authenticationManager: getIt<AuthenticationManager>(),
+        encryptionManager: getIt<EncryptionManager>(),
       )..init(),
       child: const _Body(),
     );

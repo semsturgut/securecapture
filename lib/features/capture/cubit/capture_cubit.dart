@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:securecapture/core/errors/domain_error.dart';
+import 'package:securecapture/core/shared_domain/managers/authentication/authentication_manager.dart';
 import 'package:securecapture/core/shared_domain/managers/encryption/encryption_manager.dart';
 import 'package:securecapture/core/shared_domain/repositories/image_repository.dart';
 import 'package:securecapture/features/capture/cubit/capture_state.dart';
@@ -11,13 +12,15 @@ class CaptureCubit extends Cubit<CaptureState> {
   CaptureCubit({
     required this.permissionManager,
     required this.cameraManager,
-    required this.encryptionManager,
     required this.imageRepository,
+    required this.authenticationManager,
+    required this.encryptionManager,
   }) : super(const Loading());
   final PermissionManager permissionManager;
   final CameraManager cameraManager;
-  final EncryptionManager encryptionManager;
   final ImageRepository imageRepository;
+  final AuthenticationManager authenticationManager;
+  final EncryptionManager encryptionManager;
 
   Future<void> init() async {
     try {
@@ -47,7 +50,9 @@ class CaptureCubit extends Cubit<CaptureState> {
   Future<void> takePicture() async {
     try {
       final image = await cameraManager.takePicture();
-      await imageRepository.saveImage(image);
+      final imageBytes = await image.readAsBytes();
+      final encryptedBytes = await encryptionManager.encryptImageData(imageBytes);
+      await imageRepository.saveImage(encryptedBytes, image.name);
       emit(const Success());
       init();
     } on DomainError catch (error) {
@@ -58,6 +63,7 @@ class CaptureCubit extends Cubit<CaptureState> {
   @override
   Future<void> close() {
     cameraManager.dispose();
+    authenticationManager.revokeAuthentication();
     return super.close();
   }
 }
