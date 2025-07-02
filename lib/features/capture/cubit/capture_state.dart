@@ -11,5 +11,6 @@ class CaptureState with _$CaptureState {
   const factory CaptureState.loading() = Loading;
   const factory CaptureState.granted({required CameraController cameraController}) = PermissionGranted;
   const factory CaptureState.denied() = PermissionDenied;
+  const factory CaptureState.success() = Success;
   const factory CaptureState.error({required DomainError error}) = Error;
 }

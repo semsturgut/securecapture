@@ -1,10 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:injectable/injectable.dart';
-import 'package:securecapture/core/errors/camera_error.dart';
-import 'package:securecapture/features/capture/domain/services/camera_service.dart';
+import 'package:securecapture/core/errors/common_error.dart';
+import 'package:securecapture/features/capture/domain/managers/camera_manager.dart';
 
-@LazySingleton(as: CameraService)
-class CameraServiceImpl implements CameraService {
+@LazySingleton(as: CameraManager)
+class CameraManagerImpl implements CameraManager {
   CameraController? _controller;
 
   @override
@@ -20,7 +20,7 @@ class CameraServiceImpl implements CameraService {
       await _controller!.initialize();
       return _controller!;
     } catch (e) {
-      throw const CameraError();
+      throw CommonError('Failed to initialize camera: ${e.toString()}');
     }
   }
 
@@ -29,7 +29,7 @@ class CameraServiceImpl implements CameraService {
     try {
       return await _controller!.takePicture();
     } catch (e) {
-      throw const CameraError();
+      throw CommonError('Failed to take picture: ${e.toString()}');
     }
   }
 
@@ -38,7 +38,6 @@ class CameraServiceImpl implements CameraService {
     /// Hot restart will not dispose the camera controller on Android during camera view. Here's the issue:
     /// https://github.com/flutter/flutter/issues/167305#issuecomment-2860423143
     /// This won't be a problem in production.
-    /// TODO: Take a second look at this.
     await _controller?.dispose();
     _controller = null;
   }

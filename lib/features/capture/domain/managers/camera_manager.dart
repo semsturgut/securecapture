@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 
-abstract class CameraService {
+abstract class CameraManager {
   /// Initialize the camera
   /// Returns a [CameraController] if the camera is initialized successfully
   /// Throws a [DomainError] if the camera is not initialized successfully

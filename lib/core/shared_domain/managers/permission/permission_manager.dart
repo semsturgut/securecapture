@@ -1,6 +1,6 @@
 import 'package:permission_handler/permission_handler.dart';
 
-abstract class PermissionService {
+abstract class PermissionManager {
   /// Request permission to use the camera
   /// Returns a [PermissionStatus]
   Future<PermissionStatus> requestPermission();

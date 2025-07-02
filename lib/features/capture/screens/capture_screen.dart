@@ -1,6 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:securecapture/core/shared_domain/managers/encryption/encryption_manager.dart';
+import 'package:securecapture/core/shared_domain/repositories/image_repository.dart';
 import 'package:securecapture/core/widgets/custom_app_bar.dart';
 import 'package:securecapture/core/widgets/button.dart';
 import 'package:securecapture/core/widgets/error_view.dart';
@@ -8,8 +10,9 @@ import 'package:securecapture/core/widgets/loading_widget.dart';
 import 'package:securecapture/di/di.dart';
 import 'package:securecapture/features/capture/cubit/capture_cubit.dart';
 import 'package:securecapture/features/capture/cubit/capture_state.dart';
-import 'package:securecapture/core/shared_domain/services/permission_service.dart';
-import 'package:securecapture/features/capture/domain/services/camera_service.dart';
+import 'package:securecapture/core/shared_domain/managers/permission/permission_manager.dart';
+import 'package:securecapture/features/capture/domain/managers/camera_manager.dart';
+import 'package:securecapture/features/gallery/screens/gallery_screen.dart';
 
 class CaptureScreen extends StatelessWidget {
   const CaptureScreen({super.key});
@@ -17,7 +20,12 @@ class CaptureScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CaptureCubit(permissionService: getIt<PermissionService>(), cameraService: getIt<CameraService>())..init(),
+      create: (context) => CaptureCubit(
+        permissionManager: getIt<PermissionManager>(),
+        cameraManager: getIt<CameraManager>(),
+        encryptionManager: getIt<EncryptionManager>(),
+        imageRepository: getIt<ImageRepository>(),
+      )..init(),
       child: const _Body(),
     );
   }
@@ -36,11 +44,14 @@ class _Body extends StatelessWidget {
           if (state is PermissionDenied) {
             _showPermissionDeniedDialog(context);
           }
+          if (state is Success) {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const GalleryScreen()));
+          }
         },
         builder: (context, state) {
           return state.maybeWhen(
             loading: () => const LoadingWidget(),
-            error: (error) => ErrorView(reloadCallback: () => context.read<CaptureCubit>().init(), message: error.declaration),
+            error: (error) => ErrorView(reloadCallback: () => context.read<CaptureCubit>().init(), message: error.toString()),
             granted: (cameraController) => _GrantedView(cameraController: cameraController),
             orElse: () => const SizedBox.shrink(),
           );
@@ -93,7 +104,10 @@ class _GrantedView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               spacing: 16,
               children: [
-                Button(icon: Icons.image, onTap: () {}),
+                Button(
+                  icon: Icons.image,
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const GalleryScreen())),
+                ),
                 Expanded(
                   child: Button(text: 'Take picture', icon: Icons.camera_alt, onTap: () => context.read<CaptureCubit>().takePicture()),
                 ),

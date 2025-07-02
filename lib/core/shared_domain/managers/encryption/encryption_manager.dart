@@ -1,4 +1,6 @@
-abstract class EncryptionService {
+/// TODO: Consider separating concerns by creating dedicated Service and
+/// Repository layers to improve testability and maintainability.
+abstract class EncryptionManager {
   /// Generate a new encryption key, and store it in the biometric storage.
   /// This method will skip the generation if the key already exists.
   /// Requires biometric authentication.

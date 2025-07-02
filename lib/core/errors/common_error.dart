@@ -1,9 +1,12 @@
 import 'package:securecapture/core/errors/domain_error.dart';
 
+// TODO: Consider creating a separate error class like [StorageError] for database and file system operations.
 class CommonError implements DomainError {
   const CommonError(this.message);
+
+  @override
   final String message;
 
   @override
-  final String declaration = 'Common error';
+  String toString() => message;
 }

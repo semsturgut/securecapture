@@ -1,3 +1,4 @@
 abstract class DomainError {
-  final String declaration = 'Something went wrong';
+  const DomainError(this.message);
+  final String message;
 }
