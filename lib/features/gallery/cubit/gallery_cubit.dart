@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:securecapture/core/errors/common_error.dart';
@@ -35,13 +36,24 @@ class GalleryCubit extends Cubit<GalleryState> {
     }
   }
 
-  Future<List<int>> getDecryptedImageBytes(String imageId) async {
+  Future<List<int>> getDecryptedThumbnailBytes(String imageId) async {
     try {
-      final bytes = await imageRepository.getImageBytes(imageId);
+      final bytes = await imageRepository.getThumbnailBytes(imageId);
       return await encryptionManager.decryptImageData(bytes);
     } on DomainError catch (e) {
       emit(state.copyWith(error: e, isLoading: false));
-      return [];
+      return Uint8List(0);
+    }
+  }
+
+  Future<void> showImage(String imageId) async {
+    try {
+      emit(state.copyWith(isLoading: true));
+      final bytes = await imageRepository.getImageBytes(imageId);
+      final decryptedBytes = await encryptionManager.decryptImageData(bytes);
+      emit(state.copyWith(imageBytesToShow: Uint8List.fromList(decryptedBytes), isLoading: false));
+    } on DomainError catch (e) {
+      emit(state.copyWith(error: e, isLoading: false));
     }
   }
 

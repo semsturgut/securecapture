@@ -41,7 +41,7 @@ class CaptureCubit extends Cubit<CaptureState> {
     emit(const Loading());
     final result = await permissionManager.openSettings();
     if (result) {
-      await init();
+      reset();
     } else {
       emit(const PermissionDenied());
     }
@@ -49,16 +49,23 @@ class CaptureCubit extends Cubit<CaptureState> {
 
   Future<void> takePicture() async {
     try {
+      emit(const Loading());
       final image = await cameraManager.takePicture();
-      final imageBytes = await image.readAsBytes();
+      final imageBytes = await imageRepository.readAsBytes(image);
+      final thumbnailBytes = await imageRepository.createThumbnail(imageBytes);
+
       final encryptedBytes = await encryptionManager.encryptImageData(imageBytes);
-      await imageRepository.saveImage(encryptedBytes, image.name);
+      final encryptedThumbnailBytes = await encryptionManager.encryptImageData(thumbnailBytes);
+
+      await imageRepository.saveImage(encryptedBytes, encryptedThumbnailBytes, image.name);
       emit(const Success());
-      init();
+      reset();
     } on DomainError catch (error) {
       emit(Error(error: error));
     }
   }
+
+  void reset() => init(); // Go back to initial state
 
   @override
   Future<void> close() {

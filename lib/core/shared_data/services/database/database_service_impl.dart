@@ -33,7 +33,8 @@ class DatabaseServiceImpl implements DatabaseService {
       CREATE TABLE encrypted_images (
         id TEXT PRIMARY KEY,
         filename TEXT NOT NULL,
-        file_path TEXT NOT NULL
+        file_path TEXT NOT NULL,
+        thumbnail_path TEXT NOT NULL
       )
     ''');
   }

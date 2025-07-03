@@ -12,6 +12,7 @@ import 'package:securecapture/core/widgets/loading_widget.dart';
 import 'package:securecapture/di/di.dart';
 import 'package:securecapture/features/gallery/cubit/gallery_cubit.dart';
 import 'package:securecapture/features/gallery/cubit/gallery_state.dart';
+import 'package:securecapture/features/gallery/screens/image_view_screen.dart';
 
 class GalleryScreen extends StatelessWidget {
   const GalleryScreen({super.key});
@@ -37,7 +38,13 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GalleryCubit, GalleryState>(
+    return BlocConsumer<GalleryCubit, GalleryState>(
+      listener: (context, state) {
+        if (state.imageBytesToShow != null) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ImageViewScreen(imageBytes: state.imageBytesToShow!)));
+        }
+      },
+      listenWhen: (previous, current) => previous.imageBytesToShow != current.imageBytesToShow,
       builder: (context, state) {
         if (state.isLoading) {
           return const LoadingWidget();
@@ -85,7 +92,10 @@ class _ImageGrid extends StatelessWidget {
         ),
         itemCount: images.length,
         itemBuilder: (context, index) {
-          return _ImageTile(imageModel: images[index]);
+          return GestureDetector(
+            onTap: () => context.read<GalleryCubit>().showImage(images[index].id),
+            child: _ImageTile(imageModel: images[index]),
+          );
         },
       ),
     );
@@ -102,7 +112,7 @@ class _ImageTile extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: FutureBuilder<List<int>>(
-        future: context.read<GalleryCubit>().getDecryptedImageBytes(imageModel.id),
+        future: context.read<GalleryCubit>().getDecryptedThumbnailBytes(imageModel.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container(

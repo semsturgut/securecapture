@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:securecapture/core/errors/domain_error.dart';
 import 'package:securecapture/core/shared_data/models/image.dart';
@@ -11,5 +13,6 @@ class GalleryState with _$GalleryState {
     @Default(false) bool isAuthenticated,
     @Default([]) List<ImageModel> images,
     DomainError? error,
+    Uint8List? imageBytesToShow,
   }) = _GalleryState;
 }

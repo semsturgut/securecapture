@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:securecapture/core/shared_data/services/database/database_service.dart';
 import 'package:securecapture/core/shared_domain/managers/authentication/authentication_manager.dart';
+import 'package:securecapture/core/widgets/custom_app_bar.dart';
+import 'package:securecapture/di/di.dart';
 import 'package:securecapture/features/capture/screens/capture_screen.dart';
-import 'package:securecapture/features/dashboard/cubit/dashboard_cubit.dart';
 import 'package:securecapture/features/gallery/screens/gallery_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void dispose() {
+    getIt<DatabaseService>().close();
+    getIt<AuthenticationManager>().dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DashboardCubit(
-        authenticationManager: context.read<AuthenticationManager>(),
-        databaseService: context.read<DatabaseService>(),
-      ),
-      child: const _Body(),
-    );
+    return const _Body();
   }
 }
 
@@ -27,6 +33,7 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(title: 'Dashboard'),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

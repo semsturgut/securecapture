@@ -45,14 +45,19 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>To scan your trading cards, we'll need access to your camera. This lets you instantly see card details and prices, and easily add cards to your collection.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to your microphone to record videos for documents.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to save photos</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to take photos</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need access to your microphone to record audio</string>
+	<key>PHPhotoLibraryLimitedUsageDescription</key>
+	<string>This app needs access to selected photos to identify cards from your gallery.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>We need access to your face ID to use the app</string>
-	<false/>
 </dict>
 </plist>
