@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:securecapture/di/di.dart';
 import 'package:securecapture/features/capture/screens/capture_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/zoned_widget_test_wrapper.dart';
 import '../../utils/init_tester.dart';
@@ -14,14 +13,10 @@ void main() {
     IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
     setUpAll(() async {
-      final sharedPreferences = await SharedPreferences.getInstance();
-
       final secureStorage = FlutterSecureStorage(
         iOptions: IOSOptions.defaultOptions.copyWith(accountName: 'app_account_name', accessibility: KeychainAccessibility.first_unlock),
         aOptions: AndroidOptions.defaultOptions.copyWith(encryptedSharedPreferences: true),
       );
-
-      await sharedPreferences.clear();
       await secureStorage.deleteAll();
     });
 
