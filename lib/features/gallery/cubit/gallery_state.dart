@@ -13,6 +13,7 @@ class GalleryState with _$GalleryState {
     @Default(false) bool isAuthenticated,
     @Default([]) List<ImageModel> images,
     DomainError? error,
+    @Default(false) bool isImageViewLoading,
     Uint8List? imageBytesToShow,
   }) = _GalleryState;
 }

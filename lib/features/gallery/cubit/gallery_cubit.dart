@@ -48,10 +48,10 @@ class GalleryCubit extends Cubit<GalleryState> {
 
   Future<void> showImage(String imageId) async {
     try {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(isImageViewLoading: true));
       final bytes = await imageRepository.getImageBytes(imageId);
       final decryptedBytes = await encryptionManager.decryptImageData(bytes);
-      emit(state.copyWith(imageBytesToShow: Uint8List.fromList(decryptedBytes), isLoading: false));
+      emit(state.copyWith(imageBytesToShow: Uint8List.fromList(decryptedBytes), isImageViewLoading: false));
     } on DomainError catch (e) {
       emit(state.copyWith(error: e, isLoading: false));
     }

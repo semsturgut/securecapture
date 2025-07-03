@@ -40,11 +40,19 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<GalleryCubit, GalleryState>(
       listener: (context, state) {
-        if (state.imageBytesToShow != null) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ImageViewScreen(imageBytes: state.imageBytesToShow!)));
+        if (state.imageBytesToShow != null && state.isAuthenticated) {
+          showDialog(
+            context: context,
+            builder: (context) => ImageViewScreen(imageBytes: state.imageBytesToShow!),
+          );
         }
       },
       listenWhen: (previous, current) => previous.imageBytesToShow != current.imageBytesToShow,
+      buildWhen: (previous, current) =>
+          previous.isLoading != current.isLoading ||
+          previous.isAuthenticated != current.isAuthenticated ||
+          previous.images != current.images ||
+          previous.error != current.error,
       builder: (context, state) {
         if (state.isLoading) {
           return const LoadingWidget();
