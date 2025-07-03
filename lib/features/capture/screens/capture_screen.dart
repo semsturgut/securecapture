@@ -94,10 +94,13 @@ class _GrantedView extends StatelessWidget {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        SizedBox(
-          width: cameraController.value.previewSize?.height ?? 0,
-          height: cameraController.value.previewSize?.width ?? 0,
-          child: CameraPreview(cameraController),
+        ClipRect(
+          child: Center(
+            child: Transform.scale(
+              scale: 1 / (cameraController.value.aspectRatio * MediaQuery.of(context).size.aspectRatio),
+              child: CameraPreview(cameraController),
+            ),
+          ),
         ),
         SafeArea(
           child: Padding(

@@ -9,5 +9,5 @@ abstract class ImageRepository {
   Future<List<int>> getImageBytes(String id);
   Future<List<int>> getThumbnailBytes(String id);
   Future<Uint8List> readAsBytes(XFile file);
-  Future<List<int>> createThumbnail(Uint8List imageBytes, {int size = 100});
+  Future<List<int>> createThumbnail(Uint8List imageBytes, {int reductionFactor = 8});
 }

@@ -12,8 +12,9 @@ class GalleryState with _$GalleryState {
     @Default(false) bool isLoading,
     @Default(false) bool isAuthenticated,
     @Default([]) List<ImageModel> images,
-    DomainError? error,
+    @Default({}) Map<String, Uint8List> thumbnailCache,
     @Default(false) bool isImageViewLoading,
     Uint8List? imageBytesToShow,
+    DomainError? error,
   }) = _GalleryState;
 }

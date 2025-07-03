@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:securecapture/core/errors/common_error.dart';
 import 'package:securecapture/features/capture/domain/managers/camera_manager.dart';
@@ -18,6 +19,7 @@ class CameraManagerImpl implements CameraManager {
       _controller = CameraController(camera, ResolutionPreset.high, enableAudio: false);
 
       await _controller!.initialize();
+      await _controller!.lockCaptureOrientation(DeviceOrientation.portraitUp);
       return _controller!;
     } catch (e) {
       throw CommonError('Failed to initialize camera: ${e.toString()}');

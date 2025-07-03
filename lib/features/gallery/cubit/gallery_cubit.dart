@@ -23,6 +23,9 @@ class GalleryCubit extends Cubit<GalleryState> {
 
   StreamSubscription<bool>? _isAuthenticatedSubscription;
 
+  static const int _maxCacheSize = 100;
+  final Map<String, Uint8List> _thumbnailCache = {};
+
   Future<void> init() async {
     if (state.isLoading) return;
     try {
@@ -36,13 +39,20 @@ class GalleryCubit extends Cubit<GalleryState> {
     }
   }
 
-  Future<List<int>> getDecryptedThumbnailBytes(String imageId) async {
+  Future<void> loadThumbnail(String imageId) async {
+    if (_thumbnailCache.containsKey(imageId)) {
+      emit(state.copyWith(thumbnailCache: Map.from(_thumbnailCache)));
+      return;
+    }
+
     try {
       final bytes = await imageRepository.getThumbnailBytes(imageId);
-      return await encryptionManager.decryptImageData(bytes);
+      final decryptedBytes = await encryptionManager.decryptImageData(bytes);
+      _manageCacheSize();
+      _thumbnailCache[imageId] = Uint8List.fromList(decryptedBytes);
+      emit(state.copyWith(thumbnailCache: Map.from(_thumbnailCache)));
     } on DomainError catch (e) {
-      emit(state.copyWith(error: e, isLoading: false));
-      return Uint8List(0);
+      emit(state.copyWith(error: e));
     }
   }
 
@@ -57,8 +67,21 @@ class GalleryCubit extends Cubit<GalleryState> {
     }
   }
 
+  // We can also use LRU cache to manage the cache size
+  // LRU cache is a cache that removes the least recently used items first
+  void _manageCacheSize() {
+    if (_thumbnailCache.length >= _maxCacheSize) {
+      // Remove oldest entries (first 20 items)
+      final keysToRemove = _thumbnailCache.keys.take(20).toList();
+      for (final key in keysToRemove) {
+        _thumbnailCache.remove(key);
+      }
+    }
+  }
+
   @override
   Future<void> close() {
+    _thumbnailCache.clear();
     authenticationManager.revokeAuthentication();
     _isAuthenticatedSubscription?.cancel();
     return super.close();

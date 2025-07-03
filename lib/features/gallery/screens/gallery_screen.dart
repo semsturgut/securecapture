@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:securecapture/core/shared_data/models/image.dart';
@@ -90,19 +88,14 @@ class _ImageGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(4),
       child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 4,
-          mainAxisSpacing: 4,
-          childAspectRatio: 1,
-        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, mainAxisSpacing: 4, crossAxisSpacing: 4),
         itemCount: images.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () => context.read<GalleryCubit>().showImage(images[index].id),
-            child: _ImageTile(imageModel: images[index]),
+            child: _ImageTile(imageModel: images[index], onTap: (imageModel) => context.read<GalleryCubit>().showImage(imageModel.id)),
           );
         },
       ),
@@ -112,40 +105,30 @@ class _ImageGrid extends StatelessWidget {
 
 class _ImageTile extends StatelessWidget {
   final ImageModel imageModel;
+  final Function(ImageModel) onTap;
 
-  const _ImageTile({required this.imageModel});
+  const _ImageTile({required this.imageModel, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: FutureBuilder<List<int>>(
-        future: context.read<GalleryCubit>().getDecryptedThumbnailBytes(imageModel.id),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              color: Colors.grey[300],
-              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            );
-          }
+    return BlocBuilder<GalleryCubit, GalleryState>(
+      buildWhen: (previous, current) => previous.thumbnailCache[imageModel.id] != current.thumbnailCache[imageModel.id],
+      builder: (context, state) {
+        final thumbnail = state.thumbnailCache[imageModel.id];
 
-          if (snapshot.hasError) {
-            return Container(
-              color: Colors.grey[300],
-              child: const Icon(Icons.error, color: Colors.red),
-            );
-          }
-
-          if (snapshot.hasData) {
-            return Image.memory(Uint8List.fromList(snapshot.data!), fit: BoxFit.cover, width: double.infinity, height: double.infinity);
-          }
-
+        if (thumbnail == null) {
+          context.read<GalleryCubit>().loadThumbnail(imageModel.id);
           return Container(
             color: Colors.grey[300],
-            child: const Icon(Icons.image, color: Colors.grey),
+            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
           );
-        },
-      ),
+        }
+
+        return GestureDetector(
+          onTap: () => onTap(imageModel),
+          child: Image.memory(thumbnail, fit: BoxFit.cover),
+        );
+      },
     );
   }
 }

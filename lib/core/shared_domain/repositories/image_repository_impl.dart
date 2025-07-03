@@ -68,9 +68,9 @@ class ImageRepositoryImpl implements ImageRepository {
   }
 
   @override
-  Future<List<int>> createThumbnail(Uint8List imageBytes, {int size = 100}) async {
+  Future<List<int>> createThumbnail(Uint8List imageBytes, {int reductionFactor = 8}) async {
     try {
-      return await _imageProcessingService.createThumbnail(imageBytes, size: size);
+      return await _imageProcessingService.createThumbnail(imageBytes, reductionFactor: reductionFactor);
     } catch (e) {
       throw CommonError('Failed to create thumbnail: ${e.toString()}');
     }
