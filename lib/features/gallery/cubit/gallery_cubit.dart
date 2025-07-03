@@ -69,6 +69,7 @@ class GalleryCubit extends Cubit<GalleryState> {
 
   // We can also use LRU cache to manage the cache size
   // LRU cache is a cache that removes the least recently used items first
+  // Performance wise, it's better to use LRU cache than a simple map
   void _manageCacheSize() {
     if (_thumbnailCache.length >= _maxCacheSize) {
       // Remove oldest entries (first 20 items)

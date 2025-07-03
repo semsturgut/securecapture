@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
@@ -68,6 +71,107 @@ void main() {
         verify(authenticationManager.authenticate()).called(1);
         verify(imageRepository.getAllImages()).called(1);
         expect(cubit.state.isLoading, false);
+      });
+    });
+
+    group('loadThumbnail', () {
+      test('should add thumbnail to cache and emit GalleryState with thumbnailCache', () async {
+        authenticationStreamController.add(true); // Authentication required
+        when(imageRepository.getThumbnailBytes('1')).thenAnswer((_) async => Uint8List(100));
+        when(encryptionManager.decryptImageData(any)).thenAnswer((_) async => Uint8List(100));
+        final cubit = buildCubit();
+        await cubit.loadThumbnail('1');
+        verify(imageRepository.getThumbnailBytes('1')).called(1);
+        verify(encryptionManager.decryptImageData(any)).called(1);
+        expect(cubit.state.thumbnailCache, {'1': Uint8List(100)});
+      });
+
+      test('should not add thumbnail to cache if it already exists', () async {
+        authenticationStreamController.add(true); // Authentication required
+        when(imageRepository.getThumbnailBytes('1')).thenAnswer((_) async => Uint8List(100));
+        when(encryptionManager.decryptImageData(any)).thenAnswer((_) async => Uint8List(100));
+        final cubit = buildCubit();
+        await cubit.loadThumbnail('1');
+        verify(imageRepository.getThumbnailBytes('1')).called(1);
+        verify(encryptionManager.decryptImageData(any)).called(1);
+        expect(cubit.state.thumbnailCache, {'1': Uint8List(100)});
+
+        when(imageRepository.getThumbnailBytes('1')).thenAnswer((_) async => Uint8List(100));
+        when(encryptionManager.decryptImageData(any)).thenAnswer((_) async => Uint8List(100));
+        await cubit.loadThumbnail('1');
+        verifyNever(imageRepository.getThumbnailBytes('1'));
+        verifyNever(encryptionManager.decryptImageData(any));
+        expect(cubit.state.thumbnailCache, {'1': Uint8List(100)});
+      });
+
+      test('should emit GalleryState with [CommonError] when image repository throws an error', () async {
+        authenticationStreamController.add(true); // Authentication required
+        when(imageRepository.getThumbnailBytes('1')).thenThrow(CommonError('Error'));
+        final cubit = buildCubit();
+        await cubit.loadThumbnail('1');
+        verify(imageRepository.getThumbnailBytes('1')).called(1);
+        verifyNever(encryptionManager.decryptImageData(any));
+        expect(cubit.state.error, isA<CommonError>());
+      });
+    });
+
+    group('showImage', () {
+      test('should emit GalleryState with imageBytesToShow', () async {
+        authenticationStreamController.add(true); // Authentication required
+        when(imageRepository.getImageBytes('1')).thenAnswer((_) async => Uint8List(100));
+        when(encryptionManager.decryptImageData(any)).thenAnswer((_) async => Uint8List(100));
+        final cubit = buildCubit();
+        await cubit.showImage('1');
+        verify(imageRepository.getImageBytes('1')).called(1);
+        verify(encryptionManager.decryptImageData(any)).called(1);
+        expect(cubit.state.imageBytesToShow, Uint8List(100));
+      });
+
+      test('should emit GalleryState with [CommonError] when image repository throws an error', () async {
+        authenticationStreamController.add(true); // Authentication required
+        when(imageRepository.getImageBytes('1')).thenThrow(CommonError('Error'));
+        final cubit = buildCubit();
+        await cubit.showImage('1');
+        verify(imageRepository.getImageBytes('1')).called(1);
+        verifyNever(encryptionManager.decryptImageData(any));
+        expect(cubit.state.error, isA<CommonError>());
+      });
+    });
+
+    group('authenticationManager stream', () {
+      test('should call reauthenticate when app authentication is revoked and authentication is successful', () async {
+        fakeAsync((async) async {
+          authenticationStreamController.add(true); // Authentication required
+          when(authenticationManager.authenticate()).thenAnswer((_) async => true);
+          when(imageRepository.getAllImages()).thenAnswer((_) async => [_fakeImage]);
+          final cubit = buildCubit();
+          await cubit.init();
+          expect(cubit.state.isAuthenticated, true);
+          authenticationStreamController.add(false);
+          async.flushMicrotasks();
+          verify(authenticationManager.authenticate()).called(1);
+          verify(imageRepository.getAllImages()).called(1);
+          expect(cubit.state.isAuthenticated, true);
+          expect(cubit.state.images, [_fakeImage]);
+        });
+      });
+
+      test('should call reauthenticate when app authentication is revoked and authentication is not successful', () async {
+        // fakeAsync is used to wait for the authenticationStreamController to emit a value
+        fakeAsync((async) async {
+          authenticationStreamController.add(true); // Authentication required
+          when(authenticationManager.authenticate()).thenAnswer((_) async => true);
+          when(imageRepository.getAllImages()).thenAnswer((_) async => [_fakeImage]);
+          final cubit = buildCubit();
+          await cubit.init();
+          expect(cubit.state.isAuthenticated, true);
+          authenticationStreamController.add(false);
+          async.flushMicrotasks();
+          when(authenticationManager.authenticate()).thenAnswer((_) async => false);
+          verify(authenticationManager.authenticate()).called(1);
+          verify(imageRepository.getAllImages()).called(1);
+          expect(cubit.state.error, isA<CommonError>());
+        });
       });
     });
   });

@@ -10,7 +10,7 @@ import 'package:securecapture/features/dashboard/screens/dashboard_screen.dart';
 
 void run({required String environment}) {
   runZonedGuarded<Future<void>>(() async => runApp(await appWrapper(environment: environment)), (error, stack) {
-    // Error reporting tools like Firebase Crashlytics or Sentry can be used here
+    // Error reporting tools like Firebase Crashlytics or Sentry or Debug Loggers can be used here
   });
 }
 
