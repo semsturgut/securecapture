@@ -131,9 +131,3 @@ Screenshots:
     <td><img src="https://github.com/user-attachments/assets/3e05617f-3a88-40dc-a33f-44d14f16f43c" alt="screen4" width="200"/></td>
   </tr>
 </table>
-
-![screen4](https://github.com/user-attachments/assets/3e05617f-3a88-40dc-a33f-44d14f16f43c)
-![screen3](https://github.com/user-attachments/assets/26c2ac6f-870f-477d-b041-678153642cb4)
-![screen2](https://github.com/user-attachments/assets/a9e00dd8-e77c-4fba-b989-2d3805d77338)
-![screen1](https://github.com/user-attachments/assets/e5d9fee7-1d7a-44d0-95fb-506f91ae3a5b)
-
