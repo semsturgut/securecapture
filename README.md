@@ -54,6 +54,39 @@ A secure image capture and storage application built with Flutter that provides 
    flutter test
    ```
 
+## Integration Tests
+
+### Manual Setup
+To run integration tests on Android:
+
+1. **Connect an Android device or start an emulator**
+2. **Build and install the app**
+   ```bash
+   flutter build apk --debug
+   adb install build/app/outputs/flutter-apk/app-debug.apk
+   ```
+3. **Grant camera permission**
+   ```bash
+   adb shell pm grant com.example.securecapture android.permission.CAMERA
+   ```
+4. **Run integration tests**
+   ```bash
+   flutter test integration_test/main_test.dart
+   ```
+
+### Automated Script
+Use the provided shell script for automated testing:
+```bash
+./run_integration_test.sh
+```
+
+This script automatically:
+- Checks for connected devices
+- Builds the APK if needed
+- Installs the app
+- Grants camera permission
+- Runs integration tests
+
 ## Security Features
 
 - **AES Encryption**: All images encrypted before storage

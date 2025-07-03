@@ -422,10 +422,23 @@ class CommonError extends DomainError {
 ])
 ```
 
-#### b) BLoC Testing
+#### b) BLoC Testing / Unit Testing
 - Uses `bloc_test` for comprehensive state testing
 - Mockito for dependency mocking
 - Test-driven development approach
+- `fake_async` for time-based operations and streams
+- `test/features/capture/capture_cubit_test.dart` for example
+
+
+#### c) Integration Testing
+- Uses `integration_test` for end-to-end testing
+- Uses `flutter_test` for unit testing
+- Uses `mockito` for dependency mocking
+- `integration_test/features/dashboard/dashboard_screen_test.dart` for example
+
+#### d) Widget Testing
+- Uses `flutter_test` for widget testing
+- `test/core/widgets/button_test.dart` for example
 
 ## Key Design Decisions
 
@@ -473,6 +486,8 @@ The three diagrams above illustrate different aspects of the SecureCapture archi
   - Step-by-step flow from user action to secure storage
   - Multiple security checkpoints throughout the process
   - Clear separation of responsibilities between components
+
+
 
 ## Conclusion
 

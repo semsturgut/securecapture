@@ -41,6 +41,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   freezed: ^2.5.8

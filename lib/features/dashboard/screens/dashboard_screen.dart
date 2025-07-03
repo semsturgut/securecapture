@@ -39,10 +39,12 @@ class _Body extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              key: const Key('gallery_button'),
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const GalleryScreen())),
               child: const Text('View Gallery'),
             ),
             ElevatedButton(
+              key: const Key('capture_button'),
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CaptureScreen())),
               child: const Text('Take Photo'),
             ),
