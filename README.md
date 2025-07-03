@@ -87,6 +87,31 @@ This script automatically:
 - Grants camera permission
 - Runs integration tests
 
+## CI/CD Pipeline
+
+### GitHub Actions
+The project includes automated CI/CD pipeline using GitHub Actions that ensures code quality and reliability.
+
+**Workflow Triggers:**
+- ✅ **Push to main branch**: Automatically runs tests on every push
+- ✅ **Pull requests**: Validates changes before merging
+
+**Pipeline Steps:**
+1. **Environment Setup**: Configures Flutter stable channel
+2. **Dependencies**: Installs project dependencies (`flutter pub get`)
+3. **Code Generation**: Generates required code (`flutter packages pub run build_runner build`)
+4. **Code Analysis**: Runs static analysis (`flutter analyze`)
+5. **Unit Tests**: Executes all unit tests (`flutter test`)
+
+**Viewing Results:**
+- Navigate to the **Actions** tab in your GitHub repository
+- View test results, coverage reports, and build logs
+
+The CI/CD pipeline ensures that:
+- Code quality standards are maintained
+- Breaking changes are caught early
+- Development workflow remains smooth and reliable
+
 ## Security Features
 
 - **AES Encryption**: All images encrypted before storage

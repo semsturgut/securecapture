@@ -440,6 +440,40 @@ class CommonError extends DomainError {
 - Uses `flutter_test` for widget testing
 - `test/core/widgets/button_test.dart` for example
 
+## CI/CD Pipeline Architecture
+
+### GitHub Actions Integration
+The SecureCapture project implements a **continuous integration and deployment pipeline** using GitHub Actions to ensure code quality and reliability throughout the development lifecycle.
+
+#### Pipeline Configuration
+```yaml
+# .github/workflows/dart.yml
+name: Unit Tests
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+```
+
+#### Automated Quality Assurance
+The CI/CD pipeline enforces multiple quality gates:
+
+1. **Environment Setup**: Configures Flutter 3.32.5 stable channel
+2. **Dependency Resolution**: Installs project dependencies (`flutter pub get`)
+3. **Code Generation**: Generates required code files (`flutter packages pub run build_runner build`)
+4. **Static Analysis**: Runs comprehensive code analysis (`flutter analyze`)
+5. **Unit Testing**: Executes complete test suite (`flutter test`)
+
+#### Integration with Architecture
+The CI/CD pipeline complements the clean architecture by:
+- **Testing Layer Isolation**: Unit tests validate each architectural layer independently
+- **Dependency Validation**: Ensures all injectable dependencies resolve correctly
+- **Code Generation Validation**: Verifies generated code compiles and passes analysis
+- **Security Testing**: Validates security implementations through unit tests
+
+This automated pipeline ensures that the sophisticated security and architectural patterns implemented in the project remain stable and functional throughout development.
+
 ## Key Design Decisions
 
 ### 1. Security-First Approach
