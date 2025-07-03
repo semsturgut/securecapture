@@ -41,12 +41,6 @@ class EncryptionManagerImpl implements EncryptionManager {
     if (keyString == null) {
       throw CommonError('No encryption key available');
     }
-    // TODO:
-    // Performance Roadmap:
-    // We can divide the image into chunks and encrypt each chunk separately
-    // This will make the encryption faster and more efficient
-    // OR, We can use [compute] to encrypt the image in parallel
-    // Need to test with large number of images to see which is faster
 
     // Convert Base64 key to bytes
     final keyBytes = base64.decode(keyString);
