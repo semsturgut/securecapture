@@ -25,3 +25,8 @@ class AppLifeCycleStore {
     _controller.sink.add(state);
   }
 }
+
+
+extension AppLifecycleStateX on AppLifecycleState {
+  bool get isHidden => this == AppLifecycleState.paused || this == AppLifecycleState.inactive;
+}

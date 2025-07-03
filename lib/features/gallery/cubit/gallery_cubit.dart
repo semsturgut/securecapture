@@ -29,7 +29,7 @@ class GalleryCubit extends Cubit<GalleryState> {
       final isAuthenticated = await authenticationManager.authenticate();
       if (!isAuthenticated) throw CommonError("Authentication failed");
       final images = await imageRepository.getAllImages();
-      emit(state.copyWith(isAuthenticated: true, isLoading: false, images: images));
+      emit(state.copyWith(isAuthenticated: true, isLoading: false, images: images, error: null));
     } on DomainError catch (e) {
       emit(state.copyWith(error: e, isLoading: false));
     }

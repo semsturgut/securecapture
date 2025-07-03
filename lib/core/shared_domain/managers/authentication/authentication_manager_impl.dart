@@ -13,14 +13,10 @@ class AuthenticationManagerImpl implements AuthenticationManager {
   AuthenticationManagerImpl(this._localAuthentication, this._appLifeCycleStore) {
     // IDEA: We can also add timeout to clear the cached authentication if the app is
     // in the foreground and inactive for a certain amount of time.
-    _lifecycleSubscription = _appLifeCycleStore.stream.distinct().listen((state) {
-      switch (state) {
-        case AppLifecycleState.paused || AppLifecycleState.detached || AppLifecycleState.hidden:
-          _isAuthenticatedController.value = false;
-          break;
-        default:
-      }
-    });
+    _lifecycleSubscription = _appLifeCycleStore.stream
+        .distinct()
+        .where((state) => state.isHidden)
+        .listen((_) => _isAuthenticatedController.value = false);
   }
 
   final LocalAuthentication _localAuthentication;
@@ -38,6 +34,7 @@ class AuthenticationManagerImpl implements AuthenticationManager {
   @override
   Future<bool> authenticate() async {
     if (isAuthenticated) return true;
+    if (_appLifeCycleStore.value.isHidden) return false;
 
     try {
       final bool isAvailable = await _localAuthentication.isDeviceSupported();
