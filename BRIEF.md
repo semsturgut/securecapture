@@ -3,6 +3,135 @@
 ## Overview
 SecureCapture is a Flutter application that implements a **secure image capture and storage system** using modern architectural patterns and security best practices. The app follows **Clean Architecture** principles with a focus on security, scalability, and maintainability.
 
+## Architecture Overview Diagram
+
+```mermaid
+graph TB
+    %% UI Layer
+    subgraph "Presentation Layer"
+        DS[Dashboard Screen]
+        CS[Capture Screen]
+        GS[Gallery Screen]
+        
+        subgraph "BLoC/Cubit"
+            CC[Capture Cubit]
+            GC[Gallery Cubit]
+        end
+        
+        subgraph "States"
+            CST[Capture State]
+            GST[Gallery State]
+        end
+    end
+    
+    %% Domain Layer
+    subgraph "Domain Layer"
+        subgraph "Managers"
+            AM[Authentication Manager]
+            EM[Encryption Manager]
+            PM[Permission Manager]
+            CM[Camera Manager]
+        end
+        
+        subgraph "Repositories"
+            IR[Image Repository]
+        end
+        
+        subgraph "Store"
+            ALS[App Lifecycle Store]
+        end
+    end
+    
+    %% Data Layer
+    subgraph "Data Layer"
+        subgraph "Services"
+            DS_DB[Database Service]
+            IPS[Image Processing Service]
+        end
+        
+        subgraph "Models"
+            IM[Image Model]
+        end
+    end
+    
+    %% External Layer
+    subgraph "External Dependencies"
+        subgraph "Storage"
+            SQLite[(SQLite Database)]
+            FSS[Flutter Secure Storage]
+            FS[File System]
+        end
+        
+        subgraph "Platform APIs"
+            CAM[Camera API]
+            LA[Local Auth API]
+            PH[Permission Handler]
+        end
+    end
+    
+    %% Dependency Injection
+    subgraph "Dependency Injection"
+        GetIt[GetIt Container]
+        Injectable[Injectable Annotations]
+    end
+    
+    %% Connections - UI to BLoC
+    DS --> CC
+    CS --> CC
+    GS --> GC
+    
+    CC --> CST
+    GC --> GST
+    
+    %% Connections - BLoC to Domain
+    CC --> AM
+    CC --> EM
+    CC --> PM
+    CC --> CM
+    CC --> IR
+    
+    GC --> AM
+    GC --> EM
+    GC --> IR
+    
+    %% Connections - Domain to Data
+    AM --> ALS
+    EM --> FSS
+    PM --> PH
+    CM --> CAM
+    IR --> DS_DB
+    IR --> IPS
+    IR --> FS
+    
+    %% Connections - Data to External
+    DS_DB --> SQLite
+    IR --> IM
+    
+    %% Dependency Injection connections
+    GetIt -.-> AM
+    GetIt -.-> EM
+    GetIt -.-> PM
+    GetIt -.-> CM
+    GetIt -.-> IR
+    GetIt -.-> DS_DB
+    GetIt -.-> IPS
+    
+    Injectable -.-> GetIt
+    
+    %% Styling
+    classDef uiLayer fill:#e1f5fe
+    classDef domainLayer fill:#f3e5f5
+    classDef dataLayer fill:#e8f5e8
+    classDef externalLayer fill:#fff3e0
+    classDef diLayer fill:#f1f8e9
+    
+    class DS,CS,GS,CC,GC,CST,GST uiLayer
+    class AM,EM,PM,CM,IR,ALS domainLayer
+    class DS_DB,IPS,IM dataLayer
+    class SQLite,FSS,FS,CAM,LA,PH externalLayer
+    class GetIt,Injectable diLayer
+```
+
 ## Core Architectural Patterns
 
 ### 1. Clean Architecture Implementation
@@ -52,6 +181,83 @@ class GalleryCubit extends Cubit<GalleryState> {
 - **Immutable States**: Freezed classes for type-safe state management
 
 ### 4. Multi-Layered Security Architecture
+
+#### Security Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Security Layers"
+        subgraph "Authentication Layer"
+            Bio[Biometric Authentication]
+            Cache[Auth Cache]
+            Lifecycle[App Lifecycle Monitor]
+        end
+        
+        subgraph "Encryption Layer"
+            KeyGen[Key Generation]
+            SecStore[Secure Storage]
+            AES[AES-256 Encryption]
+            IV[Random IV Generation]
+        end
+        
+        subgraph "Storage Layer"
+            EncFiles[Encrypted Files]
+            Metadata[Encrypted Metadata]
+            Thumbnails[Encrypted Thumbnails]
+        end
+        
+        subgraph "Permission Layer"
+            CameraPerm[Camera Permission]
+            StoragePerm[Storage Permission]
+            BioPerm[Biometric Permission]
+        end
+    end
+    
+    %% Authentication Flow
+    Bio --> Cache
+    Lifecycle --> Cache
+    Cache --> KeyGen
+    
+    %% Encryption Flow
+    KeyGen --> SecStore
+    SecStore --> AES
+    AES --> IV
+    IV --> EncFiles
+    
+    %% Storage Flow
+    EncFiles --> Metadata
+    EncFiles --> Thumbnails
+    
+    %% Permission Flow
+    CameraPerm --> Bio
+    StoragePerm --> EncFiles
+    BioPerm --> Bio
+    
+    %% Security Properties
+    subgraph "Security Properties"
+        ZeroPlaintext[Zero Plaintext Storage]
+        BiometricGated[Biometric Gated Access]
+        SessionTimeout[Session Timeout]
+        SecureMemory[Secure Memory Handling]
+    end
+    
+    Cache --> SessionTimeout
+    Bio --> BiometricGated
+    EncFiles --> ZeroPlaintext
+    AES --> SecureMemory
+    
+    classDef authStyle fill:#e3f2fd
+    classDef encStyle fill:#f3e5f5
+    classDef storeStyle fill:#e8f5e8
+    classDef permStyle fill:#fff3e0
+    classDef secStyle fill:#ffebee
+    
+    class Bio,Cache,Lifecycle authStyle
+    class KeyGen,SecStore,AES,IV encStyle
+    class EncFiles,Metadata,Thumbnails storeStyle
+    class CameraPerm,StoragePerm,BioPerm permStyle
+    class ZeroPlaintext,BiometricGated,SessionTimeout,SecureMemory secStyle
+```
 
 #### a) Biometric Authentication
 ```dart
@@ -108,6 +314,58 @@ CREATE TABLE encrypted_images (
 - Images stored as encrypted files in app documents directory
 - Separate thumbnail storage for performance
 - UUID-based naming for security
+
+#### Data Flow Diagram - Image Capture & Encryption Process
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as Capture Screen
+    participant Cubit as Capture Cubit
+    participant PM as Permission Manager
+    participant CM as Camera Manager
+    participant AM as Auth Manager
+    participant EM as Encryption Manager
+    participant IR as Image Repository
+    participant DB as Database Service
+    participant FS as File System
+    
+    User->>UI: Tap "Take Photo"
+    UI->>Cubit: takePicture()
+    
+    Cubit->>PM: requestPermission()
+    PM-->>Cubit: PermissionGranted
+    
+    Cubit->>CM: initializeCamera()
+    CM-->>Cubit: CameraController
+    
+    Cubit->>CM: takePicture()
+    CM-->>Cubit: XFile (image)
+    
+    Cubit->>IR: readAsBytes(image)
+    IR-->>Cubit: imageBytes
+    
+    Cubit->>IR: createThumbnail(imageBytes)
+    IR-->>Cubit: thumbnailBytes
+    
+    Cubit->>AM: authenticate()
+    AM-->>Cubit: isAuthenticated = true
+    
+    Cubit->>EM: encryptImageData(imageBytes)
+    EM-->>Cubit: encryptedBytes
+    
+    Cubit->>EM: encryptImageData(thumbnailBytes)
+    EM-->>Cubit: encryptedThumbnailBytes
+    
+    Cubit->>IR: saveImage(encryptedBytes, encryptedThumbnailBytes, filename)
+    IR->>FS: writeAsBytes(encryptedBytes)
+    IR->>FS: writeAsBytes(encryptedThumbnailBytes)
+    IR->>DB: insert(imageMetadata)
+    
+    IR-->>Cubit: Success
+    Cubit-->>UI: Success State
+    UI-->>User: Photo Saved Successfully
+```
 
 ### 6. Performance Optimizations
 
@@ -184,6 +442,31 @@ class CommonError extends DomainError {
 - **Lazy initialization**: Resources created only when needed
 - **Caching strategies**: Smart thumbnail caching with size limits
 - **Memory management**: Proper disposal of resources
+
+## Architectural Diagrams Summary
+
+The three diagrams above illustrate different aspects of the SecureCapture architecture:
+
+### 1. Architecture Overview Diagram
+- **Purpose**: Shows the complete system architecture with all layers and components
+- **Key Insights**: 
+  - Clear separation of concerns between UI, Domain, and Data layers
+  - Dependency injection pattern connecting all components
+  - External dependencies isolation for better testability
+
+### 2. Security Architecture Diagram
+- **Purpose**: Highlights the multi-layered security approach
+- **Key Insights**:
+  - Four distinct security layers: Authentication, Encryption, Storage, and Permission
+  - Security properties enforced at each layer
+  - Biometric authentication as the gateway to all secure operations
+
+### 3. Data Flow Diagram
+- **Purpose**: Shows the complete image capture and encryption process
+- **Key Insights**:
+  - Step-by-step flow from user action to secure storage
+  - Multiple security checkpoints throughout the process
+  - Clear separation of responsibilities between components
 
 ## Conclusion
 
