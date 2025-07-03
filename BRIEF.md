@@ -119,11 +119,11 @@ graph TB
     Injectable -.-> GetIt
     
     %% Styling
-    classDef uiLayer fill:#e1f5fe
-    classDef domainLayer fill:#f3e5f5
-    classDef dataLayer fill:#e8f5e8
-    classDef externalLayer fill:#fff3e0
-    classDef diLayer fill:#f1f8e9
+    classDef uiLayer fill:#4a90e2,stroke:#2c5282,stroke-width:2px,color:#fff
+    classDef domainLayer fill:#7b68ee,stroke:#553c9a,stroke-width:2px,color:#fff
+    classDef dataLayer fill:#48bb78,stroke:#2f855a,stroke-width:2px,color:#fff
+    classDef externalLayer fill:#ed8936,stroke:#c05621,stroke-width:2px,color:#fff
+    classDef diLayer fill:#38b2ac,stroke:#2c7a7b,stroke-width:2px,color:#fff
     
     class DS,CS,GS,CC,GC,CST,GST uiLayer
     class AM,EM,PM,CM,IR,ALS domainLayer
@@ -131,6 +131,8 @@ graph TB
     class SQLite,FSS,FS,CAM,LA,PH externalLayer
     class GetIt,Injectable diLayer
 ```
+
+> 🔗 **[View Full Architecture Diagram](Architecture.png)** - Click to see the complete architecture overview in high resolution
 
 ## Core Architectural Patterns
 
@@ -246,11 +248,11 @@ graph TB
     EncFiles --> ZeroPlaintext
     AES --> SecureMemory
     
-    classDef authStyle fill:#e3f2fd
-    classDef encStyle fill:#f3e5f5
-    classDef storeStyle fill:#e8f5e8
-    classDef permStyle fill:#fff3e0
-    classDef secStyle fill:#ffebee
+    classDef authStyle fill:#4a90e2,stroke:#2c5282,stroke-width:2px,color:#fff
+    classDef encStyle fill:#7b68ee,stroke:#553c9a,stroke-width:2px,color:#fff
+    classDef storeStyle fill:#48bb78,stroke:#2f855a,stroke-width:2px,color:#fff
+    classDef permStyle fill:#ed8936,stroke:#c05621,stroke-width:2px,color:#fff
+    classDef secStyle fill:#e53e3e,stroke:#c53030,stroke-width:2px,color:#fff
     
     class Bio,Cache,Lifecycle authStyle
     class KeyGen,SecStore,AES,IV encStyle
@@ -258,6 +260,8 @@ graph TB
     class CameraPerm,StoragePerm,BioPerm permStyle
     class ZeroPlaintext,BiometricGated,SessionTimeout,SecureMemory secStyle
 ```
+
+> 🔗 **[View Full Security Architecture Diagram](Security%20Architecture.png)** - Click to see the complete security architecture in high resolution
 
 #### a) Biometric Authentication
 ```dart
@@ -366,6 +370,8 @@ sequenceDiagram
     Cubit-->>UI: Success State
     UI-->>User: Photo Saved Successfully
 ```
+
+> 🔗 **[View Full Data Flow Diagram](Data%20Flow%20Image%20Capture%20And%20Encryption.png)** - Click to see the complete data flow process in high resolution
 
 ### 6. Performance Optimizations
 
