@@ -9,7 +9,7 @@ A secure image capture and storage application built with Flutter that provides 
 - 🔒 **Biometric Authentication**: Face ID, Touch ID, and Fingerprint authentication
 - 🖼️ **Encrypted Gallery**: View and manage encrypted images
 - 📦 **Local Storage**: Secure local database with SQLite
-- 🌐 **Cross-Platform**: Android, iOS, Windows, Linux, and Web support
+- 🌐 **Cross-Platform**: Android and iOS support
 
 ## Technical Requirements
 
